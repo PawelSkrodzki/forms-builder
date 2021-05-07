@@ -1,147 +1,103 @@
-import React from 'react';
+import React, { Context } from 'react';
 import ReactDOM from 'react-dom';
 import Container from '@material-ui/core/Container';
-class TextAreaOptions extends React.Component {
+import TextAreaOptions from './options/textAreaOptions';
+import EmailOptions from './options/emailOptions';
+import HeaderOptions from './options/headerOptions';
+import SubmitOptions from './options/submitOptions';
+
+// React context - reducer / useReducer
+
+class ISettingsSelector extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
 
-    this.handleChange = this.handleChange.bind(this);
-    this.onSubmitForm = this.onSubmitForm.bind(this);
+    this.state = { value: '' };
   }
 
   handleChange = (event) => {
-    this.setState({
-      [event.target.name]: event.target.value
-    });
-  };
-
-  onSubmitForm() {
-    console.log(this.state);
-  }
-
-  render() {
-    return (
-      <div>
-        <form>
-          <label>
-            Name
-            <input name="name" type="text" value={this.state.inputName} onChange={this.handleChange} />
-          </label>
-          <label>
-            Placeholder
-            <input name="placeholder" type="text" value={this.state.inputPlaceholder} onChange={this.handleChange} />
-          </label>
-          <label>
-            Class name
-            <input name="className" type="text" value={this.state.inputClassName} onChange={this.handleChange} />
-          </label>
-          <label>
-            Id
-            <input name="id" type="text" value={this.state.inputId} onChange={this.handleChange} />
-          </label>
-          <p onClick={this.onSubmitForm}>Submit</p>
-        </form>
-      </div>
-    );
-  }
-}
-
-class EmailOptions extends React.Component {
-  render() {
-    return (
-      <div>
-        <label>
-          email name
-          <input type="text"></input>
-        </label>
-
-        <label>
-          email placeholder
-          <input type="text"></input>
-        </label>
-      </div>
-    );
-  }
-}
-
-class GenerateFormButton extends React.Component {
-  render() {
-    return <button>Add element</button>;
-  }
-}
-
-class ISettingsBuilder extends React.Component {
-  state = {
-    options: [
-      {
-        optionName: 'Select…',
-        value: null
-      },
-      {
-        optionName: 'textArea',
-        value: 'textArea'
-      },
-      {
-        optionName: 'email',
-        value: 'email'
-      },
-      {
-        optionName: 'submit',
-        value: 'submit'
-      },
-      {
-        optionName: 'header',
-        value: 'header'
-      }
-    ]
-  };
-
-  handleChange = (event) => {
-    this.setState({ value: event.target.value });
-
-    switch (event.target.value) {
-      case 'textArea':
-        return ReactDOM.render(<TextAreaOptions />, document.getElementById('option-conatiner'));
-      case 'email':
-        return ReactDOM.render(<EmailOptions />, document.getElementById('option-conatiner'));
-      case 'header':
-        return console.log('email');
-      case 'submit':
-        return console.log('submit');
-      default:
-        return console.log('no option selected...');
-    }
+    this.props.onInputChange(event.target.value);
   };
 
   render() {
-    const { options, value } = this.state;
-
     return (
       <Container>
-        <select onChange={this.handleChange} value={value}>
-          {options.map((item) => (
-            <option key={item.value} value={item.value}>
-              {item.optionName}
-            </option>
-          ))}
+        <select onChange={this.handleChange}>
+          <option key={'Select…'} value={'Select…'}>
+            Select…
+          </option>
+          <option key={'textArea'} value={'textArea'}>
+            textArea
+          </option>
+          <option key={'email'} value={'email'}>
+            email
+          </option>
+          <option key={'submit'} value={'submit'}>
+            submit
+          </option>
+          <option key={'header'} value={'header'}>
+            header
+          </option>
         </select>
-        <div id="option-conatiner"></div>
-        <GenerateFormButton />
       </Container>
     );
   }
 }
 
-// class ISettingsBuilder extends React.Component {
-//   render() {
-//     return (
-//       <Container>
-//         <h1>Select form options</h1>
-//         <form></form>
-//       </Container>
-//     );
-//   }
-// }
+class ISettingsBuilder extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.handleSelectChange = this.handleSelectChange.bind(this);
+    this.handleOptionsChange = this.handleOptionsChange.bind(this);
+    this.onClick = this.onClick.bind(this);
+
+    this.state = { inputType: '', inputSettings: '' };
+  }
+
+  handleSelectChange(value) {
+    this.setState({ inputType: value });
+  }
+
+  handleOptionsChange(value) {
+    this.setState({ inputSettings: value });
+  }
+
+  onClick = () => {
+    console.log(this.state);
+  };
+
+  render() {
+    let inputType = this.state.inputType;
+
+    let inputOptions;
+
+    switch (inputType) {
+      case 'textArea':
+        inputOptions = <TextAreaOptions onChange={this.handleOptionsChange} />;
+        break;
+      case 'email':
+        inputOptions = <EmailOptions onChange={this.handleOptionsChange} />;
+        break;
+      case 'header':
+        inputOptions = <HeaderOptions onChange={this.handleOptionsChange} />;
+        break;
+      case 'submit':
+        inputOptions = <SubmitOptions onChange={this.handleOptionsChange} />;
+        break;
+      default:
+        console.log('Selecy your input');
+        break;
+    }
+
+    return (
+      <Container>
+        <ISettingsSelector onInputChange={this.handleSelectChange} />
+        {inputOptions}
+        <p onClick={this.onClick}>dodaj element(sprawdź stan)</p>
+      </Container>
+    );
+  }
+}
 
 export default ISettingsBuilder;
